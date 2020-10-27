@@ -18,3 +18,48 @@ msgid ""
 "This application is used to export the monthly malaria report as a "
 "Microsoft Word document. To start, select the month and the button."
 msgstr "Cette application est utilisée pour exporter le rapport mensuel sur le paludisme sous forme de document Microsoft Word. Pour commencer, sélectionnez le mois et le bouton."
+
+msgid "Generate Bulletin (non formatted)"
+msgstr "Générer le bulletin non formaté"
+
+msgid "Month"
+msgstr "Mois"
+
+msgid "January"
+msgstr "Janiver"
+
+msgid "February"
+msgstr "Fevrier"
+
+msgid "March"
+msgstr "Mars"
+
+msgid "April"
+msgstr "Avril"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juin"
+
+msgid "July"
+msgstr "Juillet"
+
+msgid "August"
+msgstr "Aout"
+
+msgid "September"
+msgstr "Septembre"
+
+msgid "October"
+msgstr "Octobre"
+
+msgid "November"
+msgstr "Novembre"
+
+msgid "December"
+msgstr "Decembre"
+
+msgid "Year"
+msgstr "année"

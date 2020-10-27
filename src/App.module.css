@@ -1,9 +1,22 @@
 .container {
-    width: 100%;
+    width: 75%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
+    margin: 50px;
+}
+
+.block {
+    margin: 20px;
+    display: block;
+}
+
+.picker {
+    width: 200px;
+}
+
+.buttons {
+    margin: 5px;
+}
+.labels {
+    font-size: 8pt;
+    font-style: italic;
 }

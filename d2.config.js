@@ -1,7 +1,7 @@
 const config = {
     type: 'app',
     name: 'bulletin-app',
-    title: 'Bulletin Mensuel De Paludisme Exportateur',
+    title: 'Bulletin mensuel du programme paludisme',
     entryPoints: {
         app: './src/App',
     },

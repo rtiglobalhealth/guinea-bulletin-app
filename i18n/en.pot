@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2020-10-27T17:56:30.739Z\n"
-"PO-Revision-Date: 2020-10-27T17:56:30.739Z\n"
+"POT-Creation-Date: 2020-10-27T23:28:06.636Z\n"
+"PO-Revision-Date: 2020-10-27T23:28:06.636Z\n"
 
 msgid "Monthly Malaria Bulletin"
 msgstr ""
@@ -16,5 +16,50 @@ msgid ""
 "Microsoft Word document. To start, select the month and the button."
 msgstr ""
 
+msgid "Month"
+msgstr ""
+
+msgid "January"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgid "Year"
+msgstr ""
+
 msgid "Generate Bulletin"
+msgstr ""
+
+msgid "Generate Bulletin (non formatted)"
 msgstr ""
