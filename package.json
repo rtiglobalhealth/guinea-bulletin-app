@@ -1,6 +1,6 @@
 {
   "name": "bulletin-app",
-  "version": "1.0.0",
+  "version": "0.9.0",
   "description": "",
   "license": "BSD-3-Clause",
   "private": true,
@@ -8,13 +8,23 @@
     "build": "d2-app-scripts build",
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
-    "deploy": "d2-app-scripts deploy"
+    "deploy": "d2-app-scripts deploy",
+    "extract-pot": "d2-i18n-extract -p src/ -o i18n/",
+    "localize": "yarn extract-pot && d2-i18n-generate -n NAMESPACE -p ./i18n/ -o ./src/locales/"
   },
   "devDependencies": {
     "@dhis2/cli-app-scripts": "^5.4.0"
   },
   "dependencies": {
     "@dhis2/app-runtime": "^2.4.0",
-    "@dhis2/ui": "^5.7.2"
+    "@dhis2/d2-i18n": "^1.0.6",
+    "@dhis2/d2-i18n-extract": "^1.0.8",
+    "@dhis2/d2-i18n-generate": "^1.2.0",
+    "@dhis2/ui": "^5.7.2",
+    "docxtemplater": "^3.19.6",
+    "docxtemplater-style-module": "https://modules.docxtemplater.com/packages/v2/apreston_rti/91535868-39e4-4833-5d91-bf20abf081b0/styling-module-3.3.1.tar.gz",
+    "file-saver": "^2.0.2",
+    "husky": "^5.0.0-beta.0",
+    "pizzip": "^3.0.6"
   }
 }

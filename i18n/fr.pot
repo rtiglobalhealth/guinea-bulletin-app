@@ -5,16 +5,16 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2020-10-27T17:56:30.739Z\n"
-"PO-Revision-Date: 2020-10-27T17:56:30.739Z\n"
+"POT-Creation-Date: 2020-10-27T17:22:39.696Z\n"
+"PO-Revision-Date: 2020-10-27T17:22:39.696Z\n"
+
+msgid "Generate Bulletin"
+msgstr "Générer le bulletin"
 
 msgid "Monthly Malaria Bulletin"
-msgstr ""
+msgstr "Bulletin mensuel sur le paludisme"
 
 msgid ""
 "This application is used to export the monthly malaria report as a "
 "Microsoft Word document. To start, select the month and the button."
-msgstr ""
-
-msgid "Generate Bulletin"
-msgstr ""
+msgstr "Cette application est utilisée pour exporter le rapport mensuel sur le paludisme sous forme de document Microsoft Word. Pour commencer, sélectionnez le mois et le bouton."
