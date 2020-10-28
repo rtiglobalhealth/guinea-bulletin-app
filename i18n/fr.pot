@@ -63,3 +63,6 @@ msgstr "Decembre"
 
 msgid "Year"
 msgstr "année"
+
+msgid "Users"
+msgstr "Utilisateurs"
