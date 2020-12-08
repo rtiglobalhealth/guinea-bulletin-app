@@ -63,3 +63,6 @@ msgstr ""
 
 msgid "Generate Bulletin (non formatted)"
 msgstr ""
+
+msgid "Generate Template"
+msgstr ""
