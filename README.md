@@ -44,6 +44,14 @@ You must run `yarn build` before running `yarn deploy`.<br />
 
 See the section about [deploying](https://platform.dhis2.nu/#/scripts/deploy) for more information.
 
+
+## Adding translations
+To add a translation use the d2 cli, like this:  `d2 app scripts i18n extract`
+
+1. Add translation using the i18n tag ( {i18n.t('Generate Template')} )
+2. Run the yarn localize to generate the pot file updates
+3. Provide  translations of that key in the other pot files
+
 ## Learn More
 
 You can learn more about the platform in the [DHIS2 Application Platform Documentation](https://platform.dhis2.nu/).
