@@ -26,6 +26,60 @@ const query = {
     },
 }
 
+function initializeDistrictData(indicatorUIDArray){
+
+    var table = {};
+
+    for (const indicatorUID of indicatorUIDArray) {
+
+        //these are the distircts
+        table["q1zvw5TOnZF."+indicatorUID] = "";
+        table["q1zvw5TOnZF."+indicatorUID] = "";
+        table["L1Gr2bAsR4T."+indicatorUID] = "";
+        table["THgRhO9eF0I."+indicatorUID] = "";
+        table["KnR8IiGoSxQ."+indicatorUID] = "";
+        table["GUSZlo8f9t8."+indicatorUID] = "";
+        table["mqBP8r7CwKc."+indicatorUID] = "";
+        table["IPv04VSahDi."+indicatorUID] = "";
+        table["gHO8qPxfLdl."+indicatorUID] = "";
+        table["VyZGMioVY5z."+indicatorUID] = "";
+        table["qmVkCsfziWM."+indicatorUID] = "";
+        table["CXHCAlP68L5."+indicatorUID] = "";
+        table["jiGkwTWpBeq."+indicatorUID] = "";
+        table["Motdz3Bql7L."+indicatorUID] = "";
+        table["khK0Ewyw0vV."+indicatorUID] = "";
+        table["cbst9kz3DHp."+indicatorUID] = "";
+        table["Z71gNmPnc22."+indicatorUID] = "";
+        table["zmSjEUspuVL."+indicatorUID] = "";
+        table["VUj3PJpzty8."+indicatorUID] = "";
+        table["HC3N6HbSdfg."+indicatorUID] = "";
+        table["pChTVBEAPJJ."+indicatorUID] = "";
+        table["kVULorkd7Vt."+indicatorUID] = "";
+        table["dkWnjo1bSrU."+indicatorUID] = "";
+        table["E1AAcXV9PxL."+indicatorUID] = "";
+        table["QL7gnB6sSLA."+indicatorUID] = "";
+        table["GuePjEvd6OH."+indicatorUID] = "";
+        table["TEjr8hbfz9a."+indicatorUID] = "";
+        table["zJZspSfD06r."+indicatorUID] = "";
+        table["LyGsnnzEabg."+indicatorUID] = "";
+        table["ISZZ5m7PYAC."+indicatorUID] = "";
+        table["CoKlGkkiN4a."+indicatorUID] = "";
+        table["jIFb011EBWB."+indicatorUID] = "";
+        table["yvJVq1GjI2A."+indicatorUID] = "";
+        table["ASu054HjT5Y."+indicatorUID] = "";
+        table["D5WJbugzg9L."+indicatorUID] = "";
+        table["QZJuFnb2WZ6."+indicatorUID] = "";
+        table["XraGmJ5tF7e."+indicatorUID] = "";
+        table["C4dKrWoT5au."+indicatorUID] = "";
+        table["PCa6e3khx5E."+indicatorUID] = "2";
+        table["PCa6e3khx5E."+indicatorUID] = "3";
+        table["PCa6e3khx5E."+indicatorUID] = "4";
+
+    }
+
+    return table;
+
+}
 
 
 export default class BulletinApp extends React.Component {
@@ -102,7 +156,6 @@ export default class BulletinApp extends React.Component {
           console.log("did it!");
           
         });
-      
       }
 
 
@@ -165,7 +218,6 @@ export default class BulletinApp extends React.Component {
             .addOrgUnitDimension(['Ky2CzFdfBuO'])
             .addOrgUnitDimension(['LEVEL-3']);
 
-
         // Get the data
         d2.analytics.aggregate
             .get(reporting_rates)
@@ -180,23 +232,115 @@ export default class BulletinApp extends React.Component {
                     reporting_table[ dataelement[1]+"."+dataelement[0] ] = dataelement[3]; 
                 }
 
-                // Get data for table II (Taux d'incidence )
-                d2.Api.getApi()
-                .get('/analytics?dimension=dx:mH24Ynkgo4K,ou:Ky2CzFdfBuO;LEVEL-5&filter=pe:201901&order=DESC&showHierarchy=true')
-                .then(function(table2_results) {
+                // Get data for table I
+                d2.analytics.aggregate
+                .get(table1)
+                .then(function(table1_results) {
 
-                    console.log("retrieving " +table2_results.rows.length + " rows for Table II");
-                    //console.log(table2_results);
                     var table1_data = {};
-                    var table2_data = {};
-                    var table3_data = {};
+                    console.log("retrieving " +table1_results.rows.length + " rows for Table I");
 
-                    var bulletin_data = Object.assign({}, period,table1_data,table2_data,table3_data, reporting_table);
-                    console.log("Here are the final results: " , bulletin_data);
+                    //shove all this into a object for reading later.
+                    for (var i = 0; i < table1_results.rows.length; i++) {
+                        var dataelement = table1_results.rows[i];
+                        table1_data[ dataelement[0] ] = dataelement[3]; 
+                    }
+                  
+                    // Get data for table II (Taux d'incidence )
+                    d2.Api.getApi()
+                    .get('/analytics?dimension=dx:mH24Ynkgo4K,ou:Ky2CzFdfBuO;LEVEL-5&filter=pe:201901&order=DESC&showHierarchy=true')
+                    .then(function(table2_results) {
 
-            
-            });
-        });
+                        console.log("retrieving " +table2_results.rows.length + " rows for Table II");
+                        //console.log(table2_results);
+                        
+                        var table2_data = {};
+
+                        var j = 1;
+                        //shove all this into a object for reading later.
+                        for (var i = 0; i < table2_results.rows.length; i++) {
+                            
+                            var dataelement = table2_results.rows[i];
+                            
+                            if (dataelement[2] != "Infinity"){
+                                // LOook up the facility name
+                                var outstring = table2_results['metaData']['ouNameHierarchy'][dataelement[1]];
+                                var parts = outstring.split("/");
+                                table2_data["hc"+j+"_name"] = parts[5];
+                                // Look up the district name
+                                table2_data["hc"+j+"_district"] = parts[3];  
+                                table2_data["hc"+j+"_incidence"] = dataelement[2]; 
+                                j++;
+                            }
+
+                        }
+                        
+                        // Get data for table III
+                        d2.analytics.aggregate
+                        .get(table3)
+                        .then(function(table3_results) {
+
+                            var table3_data = {};
+
+                            //initialize this (this is empty sometimes) for MW5F0uImS24
+                            table3_data = initializeDistrictData(["MW5F0uImS24","nnk0OcCQJm5"]); 
+
+                            console.log("retrieving " +table3_results.rows.length + " rows for Table III");
+                            console.log(table3_results);
+
+                             //shove all this into a object for reading later.
+                            for (var i = 0; i < table3_results.rows.length; i++) {
+                                var dataelement = table3_results.rows[i];
+                                table3_data[ dataelement[1]+"."+dataelement[0] ] = dataelement[3];
+                            }   
+
+                            var table3_data = {};
+
+                            var bulletin_data = Object.assign({}, period,table1_data,table2_data,table3_data, reporting_table);
+                            console.log("Here are the final results: " , bulletin_data);
+
+
+                             // Write this out
+                             var template_path = "./assets/templates/bulletin.v2.docx";
+                                    
+                             if (template == TEMPLATE_UNFORMATTED){
+                                 var template_path = "./assets/templates/test.v2.docx";
+                             } 
+
+                             PizZipUtils.getBinaryContent(template_path,function(error,content){
+         
+                                 var zip = new PizZip(content);
+                                 var doc=new Docxtemplater().loadZip(zip);
+                             
+                                 doc.setData(bulletin_data);
+
+                                 try {
+                                     doc.render()
+                                 }
+                                 catch (error) {
+                                     var e = {
+                                         message: error.message,
+                                         name: error.name,
+                                         stack: error.stack,
+                                         properties: error.properties,
+                                     }
+                                     console.log(JSON.stringify({error: e}));
+                                     // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
+                                     throw error;
+                                 }
+                                 
+                                 var out=doc.getZip().generate({
+                                     type:"blob",
+                                     mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                 }) //Output the document using Data-URI
+                                 saveAs(out,"bulletin_"+period+"_"+template+".docx")
+
+                             });
+
+                        }); // Table III
+                    }); // Table II
+            }); // Table I
+        }); // Reporting table
 
      }
             
