@@ -167,7 +167,7 @@ export default class BulletinApp extends React.Component {
      generateBulletin(template) {
 
          var d2 = this.state.d2;
-         this.setState({ percent_done: 24 });
+         this.setState({ percent_done: 0 });
          
          var period = this.state.year+this.state.month;
          console.log("this is the date: " + period );
@@ -231,7 +231,7 @@ export default class BulletinApp extends React.Component {
                 
                 console.log("retrieving " +reporting_rate_results.rows.length + " rows for the reporting rates");
             
-                this.setState({ percent_done: 40 });
+                this.setState({ percent_done: 20 });
 
                 var reporting_table = {};
 
@@ -249,6 +249,8 @@ export default class BulletinApp extends React.Component {
                     var table1_data = {};
                     console.log("retrieving " +table1_results.rows.length + " rows for Table I");
 
+                    this.setState({ percent_done: 40 });
+
                     //shove all this into a object for reading later.
                     for (var i = 0; i < table1_results.rows.length; i++) {
                         var dataelement = table1_results.rows[i];
@@ -263,6 +265,8 @@ export default class BulletinApp extends React.Component {
                         console.log("retrieving " +table2_results.rows.length + " rows for Table II");
                         //console.log(table2_results);
                         
+                        this.setState({ percent_done: 60 });
+
                         var table2_data = {};
 
                         var j = 1;
