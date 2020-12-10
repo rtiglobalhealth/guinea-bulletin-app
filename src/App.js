@@ -14,6 +14,9 @@ import PizZipUtils from 'pizzip/utils'
 import Docxtemplater from 'docxtemplater';
 import { saveAs } from 'file-saver';
 
+import "react-step-progress-bar/styles.css";
+import { ProgressBar } from "react-step-progress-bar";
+
 const TEMPLATE_FORMATTED = "formatted";
 const TEMPLATE_UNFORMATTED = "unformatted";
 
@@ -88,7 +91,8 @@ export default class BulletinApp extends React.Component {
         super(props);
         this.state = {
             month: "01",
-            year: "2019"
+            year: "2019",
+            percent_done: 0
         }; 
     
         getManifest('manifest.webapp')
@@ -163,6 +167,8 @@ export default class BulletinApp extends React.Component {
      generateBulletin(template) {
 
          var d2 = this.state.d2;
+         this.setState({ percent_done: 24 });
+         
          var period = this.state.year+this.state.month;
          console.log("this is the date: " + period );
          console.log("this is the template: " + template );
@@ -222,8 +228,11 @@ export default class BulletinApp extends React.Component {
         d2.analytics.aggregate
             .get(reporting_rates)
             .then(function(reporting_rate_results) {
+                
                 console.log("retrieving " +reporting_rate_results.rows.length + " rows for the reporting rates");
             
+                this.setState({ percent_done: 40 });
+
                 var reporting_table = {};
 
                 //shove all this into a object for reading later.
@@ -288,6 +297,8 @@ export default class BulletinApp extends React.Component {
                             console.log("retrieving " +table3_results.rows.length + " rows for Table III");
                             console.log(table3_results);
 
+                            this.setState({ percent_done: 80 });
+
                              //shove all this into a object for reading later.
                             for (var i = 0; i < table3_results.rows.length; i++) {
                                 var dataelement = table3_results.rows[i];
@@ -311,6 +322,7 @@ export default class BulletinApp extends React.Component {
          
                                  var zip = new PizZip(content);
                                  var doc=new Docxtemplater().loadZip(zip);
+                                 this.setState({ percent_done: 100 });
                              
                                  doc.setData(bulletin_data);
 
@@ -335,25 +347,25 @@ export default class BulletinApp extends React.Component {
                                  }) //Output the document using Data-URI
                                  saveAs(out,"bulletin_"+period+"_"+template+".docx")
 
-                             });
+                             }.bind(this));
 
-                        }); // Table III
-                    }); // Table II
-            }); // Table I
-        }); // Reporting table
+                        }.bind(this)); // Table III
+                    }.bind(this)); // Table II
+            }.bind(this)); // Table I
+        }.bind(this)  ); // Reporting table
 
      }
             
-
-
-
-
 
 
     render() {
         return (
                 <div className={classes.container}>
 
+            <ProgressBar
+                    percent={this.state.percent_done}
+                    filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+                />
                     
                 <div className={classes.block}>
                     <h1>{i18n.t('Monthly Malaria Bulletin')}</h1>
