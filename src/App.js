@@ -8,6 +8,8 @@ import { SingleSelectField } from '@dhis2/ui-widgets'
 
 import { init, getManifest } from 'd2';
 
+//import { getStyle } from './styles.js';
+import { getStyle } from "./styles";
 
 import PizZip from 'pizzip';
 import PizZipUtils from 'pizzip/utils'
@@ -83,6 +85,9 @@ function initializeDistrictData(indicatorUIDArray){
     return table;
 
 }
+
+
+
 
 
 export default class BulletinApp extends React.Component {
@@ -161,6 +166,9 @@ export default class BulletinApp extends React.Component {
           
         });
       }
+
+
+    
 
 
      /* templates can be TEMPLATE_FORMATTED or TEMPLATE_UNFORMATTED*/
@@ -294,6 +302,7 @@ export default class BulletinApp extends React.Component {
                         .then(function(table3_results) {
 
                             var table3_data = {};
+                            var table3_styles = {};
 
                             //initialize this (this is empty sometimes) for MW5F0uImS24
                             table3_data = initializeDistrictData(["MW5F0uImS24","nnk0OcCQJm5"]); 
@@ -307,11 +316,14 @@ export default class BulletinApp extends React.Component {
                             for (var i = 0; i < table3_results.rows.length; i++) {
                                 var dataelement = table3_results.rows[i];
                                 table3_data[ dataelement[1]+"."+dataelement[0] ] = dataelement[3];
-                            }   
+                            
+                                var style = getStyle(dataelement[0],dataelement[3]);
+                                table3_styles["s_"+dataelement[1]+"."+dataelement[0]] = style;
 
-                            var table3_data = {};
-
-                            var bulletin_data = Object.assign({}, period,table1_data,table2_data,table3_data, reporting_table);
+                            
+                            }  
+                            
+                            var bulletin_data = Object.assign({}, period,table1_data,table2_data,table3_data, reporting_table, table3_styles);
                             console.log("Here are the final results: " , bulletin_data);
 
 
@@ -327,7 +339,8 @@ export default class BulletinApp extends React.Component {
                                  var zip = new PizZip(content);
                                  var doc=new Docxtemplater().loadZip(zip);
                                  this.setState({ percent_done: 100 });
-                             
+                                 
+                                 doc.attachModule(styleModule);
                                  doc.setData(bulletin_data);
 
                                  try {
@@ -411,9 +424,7 @@ export default class BulletinApp extends React.Component {
                         {i18n.t('Generate Bulletin (non formatted)')}
                     </Button>
 
-                    <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.useDocx.bind(this)} type="button" value="default">
-                        {i18n.t('Generate Template')}
-                    </Button>
+    
                 </div>
 
             
