@@ -38,47 +38,46 @@ function initializeDistrictData(indicatorUIDArray){
     for (const indicatorUID of indicatorUIDArray) {
 
         //these are the distircts
-        table["q1zvw5TOnZF."+indicatorUID] = "";
-        table["q1zvw5TOnZF."+indicatorUID] = "";
-        table["L1Gr2bAsR4T."+indicatorUID] = "";
-        table["THgRhO9eF0I."+indicatorUID] = "";
-        table["KnR8IiGoSxQ."+indicatorUID] = "";
-        table["GUSZlo8f9t8."+indicatorUID] = "";
-        table["mqBP8r7CwKc."+indicatorUID] = "";
-        table["IPv04VSahDi."+indicatorUID] = "";
-        table["gHO8qPxfLdl."+indicatorUID] = "";
-        table["VyZGMioVY5z."+indicatorUID] = "";
-        table["qmVkCsfziWM."+indicatorUID] = "";
-        table["CXHCAlP68L5."+indicatorUID] = "";
-        table["jiGkwTWpBeq."+indicatorUID] = "";
-        table["Motdz3Bql7L."+indicatorUID] = "";
-        table["khK0Ewyw0vV."+indicatorUID] = "";
-        table["cbst9kz3DHp."+indicatorUID] = "";
-        table["Z71gNmPnc22."+indicatorUID] = "";
-        table["zmSjEUspuVL."+indicatorUID] = "";
-        table["VUj3PJpzty8."+indicatorUID] = "";
-        table["HC3N6HbSdfg."+indicatorUID] = "";
-        table["pChTVBEAPJJ."+indicatorUID] = "";
-        table["kVULorkd7Vt."+indicatorUID] = "";
-        table["dkWnjo1bSrU."+indicatorUID] = "";
-        table["E1AAcXV9PxL."+indicatorUID] = "";
-        table["QL7gnB6sSLA."+indicatorUID] = "";
-        table["GuePjEvd6OH."+indicatorUID] = "";
-        table["TEjr8hbfz9a."+indicatorUID] = "";
-        table["zJZspSfD06r."+indicatorUID] = "";
-        table["LyGsnnzEabg."+indicatorUID] = "";
-        table["ISZZ5m7PYAC."+indicatorUID] = "";
-        table["CoKlGkkiN4a."+indicatorUID] = "";
-        table["jIFb011EBWB."+indicatorUID] = "";
-        table["yvJVq1GjI2A."+indicatorUID] = "";
-        table["ASu054HjT5Y."+indicatorUID] = "";
-        table["D5WJbugzg9L."+indicatorUID] = "";
-        table["QZJuFnb2WZ6."+indicatorUID] = "";
-        table["XraGmJ5tF7e."+indicatorUID] = "";
-        table["C4dKrWoT5au."+indicatorUID] = "";
-        table["PCa6e3khx5E."+indicatorUID] = "2";
-        table["PCa6e3khx5E."+indicatorUID] = "3";
-        table["PCa6e3khx5E."+indicatorUID] = "4";
+        table["q1zvw5TOnZF."+indicatorUID] = "0";
+        table["q1zvw5TOnZF."+indicatorUID] = "0";
+        table["L1Gr2bAsR4T."+indicatorUID] = "0";
+        table["THgRhO9eF0I."+indicatorUID] = "0";
+        table["KnR8IiGoSxQ."+indicatorUID] = "0";
+        table["GUSZlo8f9t8."+indicatorUID] = "0";
+        table["mqBP8r7CwKc."+indicatorUID] = "0";
+        table["IPv04VSahDi."+indicatorUID] = "0";
+        table["gHO8qPxfLdl."+indicatorUID] = "0";
+        table["VyZGMioVY5z."+indicatorUID] = "0";
+        table["qmVkCsfziWM."+indicatorUID] = "0";
+        table["CXHCAlP68L5."+indicatorUID] = "0";
+        table["jiGkwTWpBeq."+indicatorUID] = "0";
+        table["Motdz3Bql7L."+indicatorUID] = "0";
+        table["khK0Ewyw0vV."+indicatorUID] = "0";
+        table["cbst9kz3DHp."+indicatorUID] = "0";
+        table["Z71gNmPnc22."+indicatorUID] = "0";
+        table["zmSjEUspuVL."+indicatorUID] = "0";
+        table["VUj3PJpzty8."+indicatorUID] = "0";
+        table["HC3N6HbSdfg."+indicatorUID] = "0";
+        table["pChTVBEAPJJ."+indicatorUID] = "0";
+        table["kVULorkd7Vt."+indicatorUID] = "0";
+        table["dkWnjo1bSrU."+indicatorUID] = "0";
+        table["E1AAcXV9PxL."+indicatorUID] = "0";
+        table["QL7gnB6sSLA."+indicatorUID] = "0";
+        table["GuePjEvd6OH."+indicatorUID] = "0";
+        table["TEjr8hbfz9a."+indicatorUID] = "0";
+        table["zJZspSfD06r."+indicatorUID] = "0";
+        table["LyGsnnzEabg."+indicatorUID] = "0";
+        table["ISZZ5m7PYAC."+indicatorUID] = "0";
+        table["CoKlGkkiN4a."+indicatorUID] = "0";
+        table["jIFb011EBWB."+indicatorUID] = "0";
+        table["yvJVq1GjI2A."+indicatorUID] = "0";
+        table["ASu054HjT5Y."+indicatorUID] = "0";
+        table["D5WJbugzg9L."+indicatorUID] = "0";
+        table["QZJuFnb2WZ6."+indicatorUID] = "0";
+        table["XraGmJ5tF7e."+indicatorUID] = "0";
+        table["C4dKrWoT5au."+indicatorUID] = "0";
+        table["PCa6e3khx5E."+indicatorUID] = "0";
+
 
     }
 
@@ -168,8 +167,6 @@ export default class BulletinApp extends React.Component {
       }
 
 
-    
-
 
      /* templates can be TEMPLATE_FORMATTED or TEMPLATE_UNFORMATTED*/
      generateBulletin(template) {
@@ -178,6 +175,17 @@ export default class BulletinApp extends React.Component {
          this.setState({ percent_done: 0 });
          
          var period = this.state.year+this.state.month;
+
+        
+         // Set Month Name
+         var month_name = ""
+        if (this.state.month == "01"){
+            month_name = i18n.t('January');
+        }
+        var month_obj = {month: month_name};
+        var year_obj = {year: this.state.year};
+
+
          console.log("this is the date: " + period );
          console.log("this is the template: " + template );
 
@@ -207,7 +215,7 @@ export default class BulletinApp extends React.Component {
                 'C8uzbGBV5Ba', //Palu cas testés
                 'ZGVY1P1NNTu', //Palu cas confirmés 
                 'D0tVMBr7pne', //Palu cas simples traités 
-                    //Palu cas graves traités 
+                'JcnnmqH9TTa',    //Palu cas graves traités 
                 'MW5F0uImS24', //Palu Total Déces
                 'no9OnzE3Yy7', //complétude
                 'yM51VVWhtk3']) //promptitude
@@ -220,7 +228,7 @@ export default class BulletinApp extends React.Component {
                 'Ih6HJlhmY5d', // % de diagnostic
                 'PifhiFgcyq1', // % de traitement
                 'zAhqn2Vwacr', //% de TPI3  
-                    //% de confirmation
+                'PifhiFgcyq1',   //% de confirmation
                 'MW5F0uImS24', //Palu Total Déces
                 'kNmu11OsuGn', // Palu/Toutes Consultations
                 'nnk0OcCQJm5', // Mois de Stock - TDR
@@ -320,10 +328,9 @@ export default class BulletinApp extends React.Component {
                                 var style = getStyle(dataelement[0],dataelement[3]);
                                 table3_styles["s_"+dataelement[1]+"."+dataelement[0]] = style;
 
-                            
                             }  
                             
-                            var bulletin_data = Object.assign({}, period,table1_data,table2_data,table3_data, reporting_table, table3_styles);
+                            var bulletin_data = Object.assign({},month_obj,year_obj, table1_data,table2_data,table3_data, reporting_table, table3_styles);
                             console.log("Here are the final results: " , bulletin_data);
 
 

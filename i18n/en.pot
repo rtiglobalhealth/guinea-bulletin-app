@@ -5,8 +5,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2020-12-14T23:29:20.274Z\n"
-"PO-Revision-Date: 2020-12-14T23:29:20.274Z\n"
+"POT-Creation-Date: 2020-12-16T22:35:45.466Z\n"
+"PO-Revision-Date: 2020-12-16T22:35:45.466Z\n"
+
+msgid "January"
+msgstr ""
 
 msgid "Monthly Malaria Bulletin"
 msgstr ""
@@ -17,9 +20,6 @@ msgid ""
 msgstr ""
 
 msgid "Month"
-msgstr ""
-
-msgid "January"
 msgstr ""
 
 msgid "February"
