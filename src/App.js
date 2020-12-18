@@ -22,8 +22,47 @@ import { ProgressBar } from "react-step-progress-bar";
 const TEMPLATE_FORMATTED = "formatted";
 const TEMPLATE_UNFORMATTED = "unformatted";
 
-const StyleModule = require("./es6");
+const StyleModule = require("./style-es6");
 const styleModule = new StyleModule();
+
+const data = { image: "https://docxtemplater.com/xt-pro.png" };
+
+const opts = {};
+
+// configure image
+opts.getImage = function (tagValue, tagName) {
+	console.log(tagValue, tagName);
+	// tagValue is "https://docxtemplater.com/xt-pro-white.png" and tagName is "image"
+	return new Promise(function (resolve, reject) {
+		getHttpData(tagValue, function (err, data) {
+			if (err) {
+				return reject(err);
+			}
+			resolve(data);
+		});
+	});
+};
+
+// Configure image size
+opts.getSize = function (img, tagValue, tagName) {
+	console.log(tagValue, tagName);
+	// img is the value that was returned by getImage
+	// This is to force the width to 600px, but keep the same aspect ration
+	const sizeOf = require("image-size");
+	const sizeObj = sizeOf(img);
+	console.log(sizeObj);
+	const forceWidth = 600;
+	const ratio = forceWidth / sizeObj.width;
+	return [
+		forceWidth,
+		// calculate height taking into account aspect ratio
+		Math.round(sizeObj.height * ratio),
+	];
+};
+
+const ImageModule = require("./image-es6");
+const imageModule = new ImageModule(opts);
+
 
 const query = {
     me: {
@@ -182,7 +221,9 @@ export default class BulletinApp extends React.Component {
         if (this.state.month == "01"){
             month_name = i18n.t('January');
         }
-        var month_obj = {month: month_name};
+        var month_obj = {
+            month_name: month_name,
+            month_num: this.state.month};
         var year_obj = {year: this.state.year};
 
 
@@ -341,37 +382,52 @@ export default class BulletinApp extends React.Component {
                                  var template_path = "./assets/templates/test.v2.docx";
                              } 
 
-                             PizZipUtils.getBinaryContent(template_path,function(error,content){
-         
-                                 var zip = new PizZip(content);
-                                 var doc=new Docxtemplater().loadZip(zip);
-                                 this.setState({ percent_done: 100 });
-                                 
-                                 doc.attachModule(styleModule);
-                                 doc.setData(bulletin_data);
+                             
+                            
+                             d2.Api.getApi()
+                            .get('/reportTables/mwIxx5SWy9b/data.json?date='+year_obj.year+'-'+month_obj.month_num+'-01')
+                            .then(function(mapdata_results) {
 
-                                 try {
-                                     doc.render()
-                                 }
-                                 catch (error) {
-                                     var e = {
-                                         message: error.message,
-                                         name: error.name,
-                                         stack: error.stack,
-                                         properties: error.properties,
-                                     }
-                                     console.log(JSON.stringify({error: e}));
-                                     // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
-                                     throw error;
-                                 }
-                                 
-                                 var out=doc.getZip().generate({
-                                     type:"blob",
-                                     mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                 }) //Output the document using Data-URI
-                                 saveAs(out,"bulletin_"+period+"_"+template+".docx")
+                                // Get data for map
+                                console.log("Got map data: ", mapdata_results['title']);
 
-                             }.bind(this));
+                                this.setState({ percent_done: 90 });
+
+
+                                PizZipUtils.getBinaryContent(template_path,function(error,content){
+                                    var zip = new PizZip(content);
+                                    var doc=new Docxtemplater().loadZip(zip);
+                                    doc.attachModule(styleModule);
+                                    //doc.attachModule(imageModule);
+                                    doc.setData(bulletin_data);
+
+                                    this.setState({ percent_done: 100 });
+
+                                    try {
+                                        doc.render()
+                                    }
+                                    catch (error) {
+                                        var e = {
+                                            message: error.message,
+                                            name: error.name,
+                                            stack: error.stack,
+                                            properties: error.properties,
+                                        }
+                                        console.log(JSON.stringify({error: e}));
+                                        // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
+                                        throw error;
+                                    }
+                                    
+                                    var out=doc.getZip().generate({
+                                        type:"blob",
+                                        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                    }) //Output the document using Data-URI
+                                    saveAs(out,"bulletin_"+period+"_"+template+".docx")
+
+                                }.bind(this));
+                             
+
+                            }.bind(this));  //Get map data
 
                         }.bind(this)); // Table III
                     }.bind(this)); // Table II
