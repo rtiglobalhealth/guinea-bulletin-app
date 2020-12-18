@@ -22,10 +22,14 @@ import { ProgressBar } from "react-step-progress-bar";
 const TEMPLATE_FORMATTED = "formatted";
 const TEMPLATE_UNFORMATTED = "unformatted";
 
+const Stream = require("stream").Transform;
+const https = require("https");
 const StyleModule = require("./style-es6");
 const styleModule = new StyleModule();
 
-const data = { image: "https://docxtemplater.com/xt-pro.png" };
+const data = { image: "https://guinea-malaria-maps.herokuapp.com/static/totalconfirmed.png"}
+//const data = { image: "http://guinea.rti-ghd.org:81/incidence.png" };
+//const data = { image: "https://docxtemplater.com/xt-pro.png" };
 
 const opts = {};
 
@@ -64,10 +68,29 @@ const ImageModule = require("./image-es6");
 const imageModule = new ImageModule(opts);
 
 
-const query = {
-    me: {
-        resource: 'me',
-    },
+function getHttpData(url, callback) {
+	https
+		.request(url, function (response) {
+			if (response.statusCode !== 200) {
+				return callback(
+					new Error(
+						`Request to ${url} failed, status code: ${response.statusCode}`
+					)
+				);
+			}
+
+			const data = new Stream();
+			response.on("data", function (chunk) {
+				data.push(chunk);
+			});
+			response.on("end", function () {
+				callback(null, data.read());
+			});
+			response.on("error", function (e) {
+				callback(e);
+			});
+		})
+		.end();
 }
 
 function initializeDistrictData(indicatorUIDArray){
@@ -117,14 +140,10 @@ function initializeDistrictData(indicatorUIDArray){
         table["C4dKrWoT5au."+indicatorUID] = "0";
         table["PCa6e3khx5E."+indicatorUID] = "0";
 
-
     }
 
     return table;
-
 }
-
-
 
 
 
@@ -152,9 +171,6 @@ export default class BulletinApp extends React.Component {
                 });
             });
 
-
-        //this.updatemonth = this.updatemonth.bind(this);
-       // this.updateyear = this.updateyear.bind(this);
         
     }
     
@@ -169,42 +185,6 @@ export default class BulletinApp extends React.Component {
         console.log("updated the month");
     }
     
-    useDocx(){
-      
-        var template_path = "./assets/demo_template.docx";
-      
-        PizZipUtils.getBinaryContent(template_path,function(error,content){
-        
-          var zip = new PizZip(content);
-          var doc=new Docxtemplater().loadZip(zip);
-          doc.attachModule(styleModule);
-        
-          doc.setData({
-            label: "Hello",
-            style: {
-              cellBackground: "#00ff00",
-              textColor: "#ffffff",
-            },
-            style2: {
-              cellBackground: "#ff0000",
-              textColor: "#0000ff",
-            },
-          });
-      
-          doc.render();
-      
-          var out=doc.getZip().generate({
-            type:"blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          });
-      
-          saveAs(out,"output.docx")
-        
-          console.log("did it!");
-          
-        });
-      }
-
 
 
      /* templates can be TEMPLATE_FORMATTED or TEMPLATE_UNFORMATTED*/
@@ -320,8 +300,7 @@ export default class BulletinApp extends React.Component {
                     .then(function(table2_results) {
 
                         console.log("retrieving " +table2_results.rows.length + " rows for Table II");
-                        //console.log(table2_results);
-                        
+                       
                         this.setState({ percent_done: 60 });
 
                         var table2_data = {};
@@ -379,11 +358,10 @@ export default class BulletinApp extends React.Component {
                              var template_path = "./assets/templates/bulletin.v2.docx";
                                     
                              if (template == TEMPLATE_UNFORMATTED){
-                                 var template_path = "./assets/templates/test.v2.docx";
+                                 var template_path = "./assets/templates/demo_template.docx";
                              } 
 
-                             
-                            
+
                              d2.Api.getApi()
                             .get('/reportTables/mwIxx5SWy9b/data.json?date='+year_obj.year+'-'+month_obj.month_num+'-01')
                             .then(function(mapdata_results) {
@@ -393,42 +371,43 @@ export default class BulletinApp extends React.Component {
 
                                 this.setState({ percent_done: 90 });
 
-
                                 PizZipUtils.getBinaryContent(template_path,function(error,content){
                                     var zip = new PizZip(content);
+                                    
+
                                     var doc=new Docxtemplater().loadZip(zip);
                                     doc.attachModule(styleModule);
-                                    //doc.attachModule(imageModule);
-                                    doc.setData(bulletin_data);
+                                    doc.attachModule(imageModule);
+                                    doc.setData(bulletin_data).compile();
 
-                                    this.setState({ percent_done: 100 });
+                                    this.setState({ percent_done: 95 });
 
-                                    try {
-                                        doc.render()
-                                    }
-                                    catch (error) {
-                                        var e = {
-                                            message: error.message,
-                                            name: error.name,
-                                            stack: error.stack,
-                                            properties: error.properties,
-                                        }
-                                        console.log(JSON.stringify({error: e}));
-                                        // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
-                                        throw error;
-                                    }
+                                    doc
+                                        .resolveData(data)
+                                        .then(function () {
+                                            console.log("data resolved");
+                                            
+                                            doc.render();
+                                            
+                                            this.setState({ percent_done: 100 });
+
+                                            var out=doc.getZip().generate({
+                                                type:"blob",
+                                                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                            }) //Output the document using Data-URI
+                                            
+                                            saveAs(out,"bulletin_"+period+"_"+template+".docx")
+                                            console.log("rendered");
+
+                                        }.bind(this))
+
+                                        .catch(function (error) {
+                                            console.log("An error occured", error);
+                                        });
                                     
-                                    var out=doc.getZip().generate({
-                                        type:"blob",
-                                        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                    }) //Output the document using Data-URI
-                                    saveAs(out,"bulletin_"+period+"_"+template+".docx")
-
+                                    
                                 }.bind(this));
-                             
-
                             }.bind(this));  //Get map data
-
                         }.bind(this)); // Table III
                     }.bind(this)); // Table II
             }.bind(this)); // Table I
