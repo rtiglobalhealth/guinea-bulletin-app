@@ -358,7 +358,9 @@ export default class BulletinApp extends React.Component {
                              var template_path = "./assets/templates/bulletin.v2.docx";
                                     
                              if (template == TEMPLATE_UNFORMATTED){
-                                 var template_path = "./assets/templates/demo_template.docx";
+                                 
+                                var template_path = "./assets/templates/demo_template.v2.docx";
+                                //var template_path = "./assets/templates/test.v2.docx";
                              } 
 
 
@@ -372,38 +374,32 @@ export default class BulletinApp extends React.Component {
                                 this.setState({ percent_done: 90 });
 
                                 PizZipUtils.getBinaryContent(template_path,function(error,content){
-                                    var zip = new PizZip(content);
                                     
-
-                                    var doc=new Docxtemplater().loadZip(zip);
-                                    doc.attachModule(styleModule);
-                                    doc.attachModule(imageModule);
-                                    doc.setData(bulletin_data).compile();
-
+                                    var zip = new PizZip(content);
+                                    const doc = new Docxtemplater(zip, { modules: [imageModule] });
+                                    
                                     this.setState({ percent_done: 95 });
+                                    
+                                    bulletin_data['image']="assets/incidence.png";
+                                    doc.setData(bulletin_data);
+                                    
+                                   
+                                    doc.resolveData(bulletin_data).then(function () {
+                                        console.log("ready");
 
-                                    doc
-                                        .resolveData(data)
-                                        .then(function () {
-                                            console.log("data resolved");
-                                            
-                                            doc.render();
-                                            
-                                            this.setState({ percent_done: 100 });
-
-                                            var out=doc.getZip().generate({
-                                                type:"blob",
-                                                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                            }) //Output the document using Data-URI
-                                            
-                                            saveAs(out,"bulletin_"+period+"_"+template+".docx")
-                                            console.log("rendered");
-
-                                        }.bind(this))
-
-                                        .catch(function (error) {
-                                            console.log("An error occured", error);
+                                        doc.render();
+                                        var out = doc.getZip().generate({
+                                          type: "blob",
+                                          mimeType:
+                                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                         });
+                                        saveAs(out, "generated.docx");
+                                      });
+                                    
+                                      this.setState({ percent_done: 100 });  
+                                    console.log("rendered");
+                                    
+                                    
                                     
                                     
                                 }.bind(this));
