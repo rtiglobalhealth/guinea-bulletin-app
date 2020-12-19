@@ -427,9 +427,6 @@ export default class BulletinApp extends React.Component {
                         {i18n.t('Generate Bulletin')}
                     </Button>
 
-                    <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.generateBulletin.bind(this, TEMPLATE_UNFORMATTED)} type="button" value="default">
-                        {i18n.t('Generate Bulletin (non formatted)')}
-                    </Button>
 
     
                 </div>
