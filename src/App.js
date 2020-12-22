@@ -8,6 +8,8 @@ import { SingleSelectField } from '@dhis2/ui-widgets'
 
 import { init, getManifest } from 'd2';
 
+
+
 //import { getStyle } from './styles.js';
 import { getStyle } from "./styles";
 
@@ -22,6 +24,7 @@ import { ProgressBar } from "react-step-progress-bar";
 const TEMPLATE_FORMATTED = "formatted";
 const TEMPLATE_UNFORMATTED = "unformatted";
 
+const axios = require('axios');
 const Stream = require("stream").Transform;
 const https = require("https");
 const StyleModule = require("./style-es6");
@@ -31,23 +34,33 @@ const data = { image: "https://guinea-malaria-maps.herokuapp.com/static/totalcon
 //const data = { image: "http://guinea.rti-ghd.org:81/incidence.png" };
 //const data = { image: "https://docxtemplater.com/xt-pro.png" };
 
-const opts = {};
+function base64DataURLToArrayBuffer(dataURL) {
+    const base64Regex = /^data:image\/(png|jpg|svg|svg\+xml);base64,/;
+    if (!base64Regex.test(dataURL)) {
+      return false;
+    }
+    const stringBase64 = dataURL.replace(base64Regex, "");
+    let binaryString;
+    if (typeof window !== "undefined") {
+      binaryString = window.atob(stringBase64);
+    } else {
+      binaryString = Buffer.from(stringBase64, "base64").toString("binary");
+    }
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      const ascii = binaryString.charCodeAt(i);
+      bytes[i] = ascii;
+    }
+    return bytes.buffer;
+  }
 
-// configure image
+  const opts = {};
 opts.getImage = function (tagValue, tagName) {
 	console.log(tagValue, tagName);
-	// tagValue is "https://docxtemplater.com/xt-pro-white.png" and tagName is "image"
-	return new Promise(function (resolve, reject) {
-		getHttpData(tagValue, function (err, data) {
-			if (err) {
-				return reject(err);
-			}
-			resolve(data);
-		});
-	});
+	 return tagValue;
 };
 
-// Configure image size
 opts.getSize = function (img, tagValue, tagName) {
 	console.log(tagValue, tagName);
 	// img is the value that was returned by getImage
@@ -64,8 +77,14 @@ opts.getSize = function (img, tagValue, tagName) {
 	];
 };
 
+
+  
+
+
+
 const ImageModule = require("./image-es6");
-const imageModule = new ImageModule(opts);
+const imageModule = new ImageModule(imageOpts);
+
 
 
 function getHttpData(url, callback) {
@@ -351,14 +370,11 @@ export default class BulletinApp extends React.Component {
                             }  
                             
                             var bulletin_data = Object.assign({},month_obj,year_obj, table1_data,table2_data,table3_data, reporting_table, table3_styles);
-                            console.log("Here are the final results: " , bulletin_data);
-
-
+                        
                              // Write this out
                              var template_path = "./assets/templates/bulletin.v2.docx";
                                     
                              if (template == TEMPLATE_UNFORMATTED){
-                                 
                                 var template_path = "./assets/templates/demo_template.v2.docx";
                                 //var template_path = "./assets/templates/test.v2.docx";
                              } 
@@ -368,41 +384,65 @@ export default class BulletinApp extends React.Component {
                             .get('/reportTables/mwIxx5SWy9b/data.json?date='+year_obj.year+'-'+month_obj.month_num+'-01')
                             .then(function(mapdata_results) {
 
-                                // Get data for map
                                 console.log("Got map data: ", mapdata_results['title']);
-
-                                this.setState({ percent_done: 90 });
+                           
+                                axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
+                                .then(res => {
+                                        
+                                    
+                                    //console.log(typeof (res.data));
+                                    var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64')
+                                    console.log(imagedata);
+                                    
+                                    var bulletin_data2= {"adampreston": "value"} ;
+                                    bulletin_data2["image"] = imagedata;
 
                                 PizZipUtils.getBinaryContent(template_path,function(error,content){
-                                    
+                            
                                     var zip = new PizZip(content);
                                     const doc = new Docxtemplater(zip, { modules: [imageModule] });
                                     
                                     this.setState({ percent_done: 95 });
                                     
-                                    bulletin_data['image']="assets/incidence.png";
-                                    doc.setData(bulletin_data);
                                     
-                                   
-                                    doc.resolveData(bulletin_data).then(function () {
-                                        console.log("ready");
+                                    console.log("Here are the final results: " , bulletin_data2);
+                                    doc.setData(bulletin_data2);
+                                    
+                                    
+                                    doc.resolveData(bulletin_data2).then(function () {
+                                        console.log("Downloaded maps");
 
                                         doc.render();
                                         var out = doc.getZip().generate({
-                                          type: "blob",
-                                          mimeType:
+                                            type: "blob",
+                                            mimeType:
                                             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                         });
                                         saveAs(out, "generated.docx");
-                                      });
+
+                                        this.setState({ percent_done: 100 });  
+                                        console.log("rendered");
+
+
+                                    });
+                                            
+     
+                                        }.bind(this));
+
+
+                                    }).catch(error => {
+                                        console.error(error)
+                                    });
+
                                     
-                                      this.setState({ percent_done: 100 });  
-                                    console.log("rendered");
                                     
-                                    
-                                    
-                                    
-                                }.bind(this));
+                                
+
+                                this.setState({ percent_done: 90 });
+
+                                
+
+
                             }.bind(this));  //Get map data
                         }.bind(this)); // Table III
                     }.bind(this)); // Table II
@@ -459,7 +499,7 @@ export default class BulletinApp extends React.Component {
                     </Button>
 
                     <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.generateBulletin.bind(this, TEMPLATE_UNFORMATTED)} type="button" value="default">
-                        {i18n.t('Generate Bulletin (non formatted)')}
+                        {i18n.t('Download Maps')}
                     </Button>
 
     
