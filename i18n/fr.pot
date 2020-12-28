@@ -66,3 +66,6 @@ msgstr "année"
 
 msgid "Users"
 msgstr "Utilisateurs"
+
+msgid "Download Maps"
+msgstr "Télécharger des cartes"

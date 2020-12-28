@@ -8,7 +8,7 @@ import { SingleSelectField } from '@dhis2/ui-widgets'
 
 import { init, getManifest } from 'd2';
 
-//import { getStyle } from './styles.js';
+
 import { getStyle } from "./styles";
 
 import PizZip from 'pizzip';
@@ -22,13 +22,72 @@ import { ProgressBar } from "react-step-progress-bar";
 const TEMPLATE_FORMATTED = "formatted";
 const TEMPLATE_UNFORMATTED = "unformatted";
 
-const StyleModule = require("./es6");
+const axios = require('axios');
+const Stream = require("stream").Transform;
+const https = require("https");
+const StyleModule = require("./style-es6");
 const styleModule = new StyleModule();
 
-const query = {
-    me: {
-        resource: 'me',
+const data = { image: "https://guinea-malaria-maps.herokuapp.com/static/totalconfirmed.png"}
+
+
+function base64DataURLToArrayBuffer(dataURL) {
+    const base64Regex = /^data:image\/(png|jpg|svg|svg\+xml);base64,/;
+    if (!base64Regex.test(dataURL)) {
+        return false;
+    }
+    const stringBase64 = dataURL.replace(base64Regex, "");
+    let binaryString;
+    if (typeof window !== "undefined") {
+        binaryString = window.atob(stringBase64);
+    } else {
+        binaryString = Buffer.from(stringBase64, "base64").toString("binary");
+    }
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        const ascii = binaryString.charCodeAt(i);
+        bytes[i] = ascii;
+    }
+    return bytes.buffer;
+}
+const imageOpts = {
+    getImage(tag) {
+        return base64DataURLToArrayBuffer(tag);
     },
+    getSize() {
+        return [600, 450];
+    },
+};
+
+
+const ImageModule = require("./image-es6");
+const imageModule = new ImageModule(imageOpts);
+
+
+function getHttpData(url, callback) {
+	https
+		.request(url, function (response) {
+			if (response.statusCode !== 200) {
+				return callback(
+					new Error(
+						`Request to ${url} failed, status code: ${response.statusCode}`
+					)
+				);
+			}
+
+			const data = new Stream();
+			response.on("data", function (chunk) {
+				data.push(chunk);
+			});
+			response.on("end", function () {
+				callback(null, data.read());
+			});
+			response.on("error", function (e) {
+				callback(e);
+			});
+		})
+		.end();
 }
 
 function initializeDistrictData(indicatorUIDArray){
@@ -78,14 +137,10 @@ function initializeDistrictData(indicatorUIDArray){
         table["C4dKrWoT5au."+indicatorUID] = "0";
         table["PCa6e3khx5E."+indicatorUID] = "0";
 
-
     }
 
     return table;
-
 }
-
-
 
 
 
@@ -113,9 +168,6 @@ export default class BulletinApp extends React.Component {
                 });
             });
 
-
-        //this.updatemonth = this.updatemonth.bind(this);
-       // this.updateyear = this.updateyear.bind(this);
         
     }
     
@@ -130,42 +182,6 @@ export default class BulletinApp extends React.Component {
         console.log("updated the month");
     }
     
-    useDocx(){
-      
-        var template_path = "./assets/demo_template.docx";
-      
-        PizZipUtils.getBinaryContent(template_path,function(error,content){
-        
-          var zip = new PizZip(content);
-          var doc=new Docxtemplater().loadZip(zip);
-          doc.attachModule(styleModule);
-        
-          doc.setData({
-            label: "Hello",
-            style: {
-              cellBackground: "#00ff00",
-              textColor: "#ffffff",
-            },
-            style2: {
-              cellBackground: "#ff0000",
-              textColor: "#0000ff",
-            },
-          });
-      
-          doc.render();
-      
-          var out=doc.getZip().generate({
-            type:"blob",
-            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          });
-      
-          saveAs(out,"output.docx")
-        
-          console.log("did it!");
-          
-        });
-      }
-
 
 
      /* templates can be TEMPLATE_FORMATTED or TEMPLATE_UNFORMATTED*/
@@ -182,7 +198,9 @@ export default class BulletinApp extends React.Component {
         if (this.state.month == "01"){
             month_name = i18n.t('January');
         }
-        var month_obj = {month: month_name};
+        var month_obj = {
+            month_name: month_name,
+            month_num: this.state.month};
         var year_obj = {year: this.state.year};
 
 
@@ -215,7 +233,7 @@ export default class BulletinApp extends React.Component {
                 'C8uzbGBV5Ba', //Palu cas testés
                 'ZGVY1P1NNTu', //Palu cas confirmés 
                 'D0tVMBr7pne', //Palu cas simples traités 
-                'JcnnmqH9TTa',    //Palu cas graves traités 
+                'JcnnmqH9TTa',  //Palu cas graves traités 
                 'MW5F0uImS24', //Palu Total Déces
                 'no9OnzE3Yy7', //complétude
                 'yM51VVWhtk3']) //promptitude
@@ -279,9 +297,8 @@ export default class BulletinApp extends React.Component {
                     .then(function(table2_results) {
 
                         console.log("retrieving " +table2_results.rows.length + " rows for Table II");
-                        //console.log(table2_results);
-                        
-                        this.setState({ percent_done: 60 });
+                       
+                        this.setState({ percent_done: 50 });
 
                         var table2_data = {};
 
@@ -318,9 +335,9 @@ export default class BulletinApp extends React.Component {
                             console.log("retrieving " +table3_results.rows.length + " rows for Table III");
                             console.log(table3_results);
 
-                            this.setState({ percent_done: 80 });
+                            this.setState({ percent_done: 60 });
 
-                             //shove all this into a object for reading later.
+                             //shove all this into a object for later.
                             for (var i = 0; i < table3_results.rows.length; i++) {
                                 var dataelement = table3_results.rows[i];
                                 table3_data[ dataelement[1]+"."+dataelement[0] ] = dataelement[3];
@@ -331,48 +348,104 @@ export default class BulletinApp extends React.Component {
                             }  
                             
                             var bulletin_data = Object.assign({},month_obj,year_obj, table1_data,table2_data,table3_data, reporting_table, table3_styles);
-                            console.log("Here are the final results: " , bulletin_data);
-
+                        
 
                              // Write this out
                              var template_path = "./assets/templates/bulletin.v2.docx";
                                     
                              if (template == TEMPLATE_UNFORMATTED){
-                                 var template_path = "./assets/templates/test.v2.docx";
+                                var template_path = "./assets/templates/demo_template.v2.docx";
+                                //var template_path = "./assets/templates/test.v2.docx";
                              } 
 
-                             PizZipUtils.getBinaryContent(template_path,function(error,content){
-         
-                                 var zip = new PizZip(content);
-                                 var doc=new Docxtemplater().loadZip(zip);
-                                 this.setState({ percent_done: 100 });
-                                 
-                                 doc.attachModule(styleModule);
-                                 doc.setData(bulletin_data);
+                             d2.Api.getApi()
+                            .get('/reportTables/mwIxx5SWy9b/data.json?date='+year_obj.year+'-'+month_obj.month_num+'-01')
+                            .then(function(mapdata_results) {
 
-                                 try {
-                                     doc.render()
-                                 }
-                                 catch (error) {
-                                     var e = {
-                                         message: error.message,
-                                         name: error.name,
-                                         stack: error.stack,
-                                         properties: error.properties,
-                                     }
-                                     console.log(JSON.stringify({error: e}));
-                                     // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
-                                     throw error;
-                                 }
-                                 
-                                 var out=doc.getZip().generate({
-                                     type:"blob",
-                                     mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                 }) //Output the document using Data-URI
-                                 saveAs(out,"bulletin_"+period+"_"+template+".docx")
+                                console.log("Got map data: ", mapdata_results['title']);
+                                this.setState({ percent_done: 70 });
 
-                             }.bind(this));
+                                axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
+                                .then(res => {
+                                    
+                                    this.setState({ percent_done: 75 });
+                                    console.log("downloaded confirmations.png");
+                                    var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
+                                    bulletin_data["img_confirmations"] = imagedata;
+                                    
+                                    axios.post('https://guinea-malaria-maps.herokuapp.com/totalconfirmed.png', mapdata_results, { responseType: 'arraybuffer' })
+                                    .then(res => {
+                                        
+                                        this.setState({ percent_done: 80 });
+                                        console.log("downloaded totalconfirmed.png");
+                                        var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
+                                        bulletin_data["img_totalconfirmed"] = imagedata;
 
+                                        axios.post('https://guinea-malaria-maps.herokuapp.com/incidence.png', mapdata_results, { responseType: 'arraybuffer' })
+                                            .then(res => {
+                                                
+                                                this.setState({ percent_done: 85 });
+                                                console.log("downloaded incidence.png");
+                                                var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
+                                                bulletin_data["img_incidence"] = imagedata;
+
+                                                PizZipUtils.getBinaryContent(template_path,function(error,content){
+                                
+                                                    this.setState({ percent_done: 90 });
+                                                    console.log("merging data into document");
+            
+                                                    var zip = new PizZip(content);
+                                                    const doc = new Docxtemplater(zip, { modules: [imageModule,styleModule] });
+                                                    
+                                                    console.log("Here are the final results: " , bulletin_data);
+                                                    doc.setData(bulletin_data);
+
+                                                    try {
+                                                        doc.render()
+                                                    }
+                                                    catch (error) {
+                                                        var e = {
+                                                            message: error.message,
+                                                            name: error.name,
+                                                            stack: error.stack,
+                                                            properties: error.properties,
+                                                        }
+                                                        console.log(JSON.stringify({error: e}));
+                                                        // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
+                                                        throw error;
+                                                    }
+                                                    
+                                                    this.setState({ percent_done: 95 });
+                                                    console.log("document rendered");
+
+                                                    var out = doc.getZip().generate({
+                                                        type: "blob",
+                                                        mimeType:
+                                                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                    });
+                                                    saveAs(out, "generated.docx");
+            
+                                                    console.log("Done!");
+                                                    this.setState({ percent_done: 100 });  
+                                                    
+                    
+                                                }.bind(this));
+                                                
+
+                                            }).catch(error => {
+                                                console.error(error)
+                                            });
+
+                                    }).catch(error => {
+                                        console.error(error)
+                                    });
+
+                                }).catch(error => {
+                                    console.error(error)
+                                });
+
+
+                            }.bind(this));  //Get map data
                         }.bind(this)); // Table III
                     }.bind(this)); // Table II
             }.bind(this)); // Table I
@@ -389,6 +462,7 @@ export default class BulletinApp extends React.Component {
             <ProgressBar
                     percent={this.state.percent_done}
                     filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+
                 />
                     
                 <div className={classes.block}>
@@ -425,10 +499,6 @@ export default class BulletinApp extends React.Component {
                 <div className={classes.block}>
                     <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.generateBulletin.bind(this, TEMPLATE_FORMATTED)} primary type="button" value="default">
                         {i18n.t('Generate Bulletin')}
-                    </Button>
-
-                    <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.generateBulletin.bind(this, TEMPLATE_UNFORMATTED)} type="button" value="default">
-                        {i18n.t('Generate Bulletin (non formatted)')}
                     </Button>
 
     
