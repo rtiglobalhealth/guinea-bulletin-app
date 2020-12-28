@@ -34,47 +34,35 @@ const data = { image: "https://guinea-malaria-maps.herokuapp.com/static/totalcon
 //const data = { image: "http://guinea.rti-ghd.org:81/incidence.png" };
 //const data = { image: "https://docxtemplater.com/xt-pro.png" };
 
+
+
 function base64DataURLToArrayBuffer(dataURL) {
     const base64Regex = /^data:image\/(png|jpg|svg|svg\+xml);base64,/;
     if (!base64Regex.test(dataURL)) {
-      return false;
+        return false;
     }
     const stringBase64 = dataURL.replace(base64Regex, "");
     let binaryString;
     if (typeof window !== "undefined") {
-      binaryString = window.atob(stringBase64);
+        binaryString = window.atob(stringBase64);
     } else {
-      binaryString = Buffer.from(stringBase64, "base64").toString("binary");
+        binaryString = Buffer.from(stringBase64, "base64").toString("binary");
     }
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
     for (let i = 0; i < len; i++) {
-      const ascii = binaryString.charCodeAt(i);
-      bytes[i] = ascii;
+        const ascii = binaryString.charCodeAt(i);
+        bytes[i] = ascii;
     }
     return bytes.buffer;
-  }
-
-  const opts = {};
-opts.getImage = function (tagValue, tagName) {
-	console.log(tagValue, tagName);
-	 return tagValue;
-};
-
-opts.getSize = function (img, tagValue, tagName) {
-	console.log(tagValue, tagName);
-	// img is the value that was returned by getImage
-	// This is to force the width to 600px, but keep the same aspect ration
-	const sizeOf = require("image-size");
-	const sizeObj = sizeOf(img);
-	console.log(sizeObj);
-	const forceWidth = 600;
-	const ratio = forceWidth / sizeObj.width;
-	return [
-		forceWidth,
-		// calculate height taking into account aspect ratio
-		Math.round(sizeObj.height * ratio),
-	];
+}
+const imageOpts = {
+    getImage(tag) {
+        return base64DataURLToArrayBuffer(tag);
+    },
+    getSize() {
+        return [100, 100];
+    },
 };
 
 
