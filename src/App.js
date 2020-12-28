@@ -9,7 +9,6 @@ import { SingleSelectField } from '@dhis2/ui-widgets'
 import { init, getManifest } from 'd2';
 
 
-//import { getStyle } from './styles.js';
 import { getStyle } from "./styles";
 
 import PizZip from 'pizzip';
@@ -338,7 +337,7 @@ export default class BulletinApp extends React.Component {
 
                             this.setState({ percent_done: 60 });
 
-                             //shove all this into a object for reading later.
+                             //shove all this into a object for later.
                             for (var i = 0; i < table3_results.rows.length; i++) {
                                 var dataelement = table3_results.rows[i];
                                 table3_data[ dataelement[1]+"."+dataelement[0] ] = dataelement[3];
@@ -396,7 +395,7 @@ export default class BulletinApp extends React.Component {
                                                     console.log("merging data into document");
             
                                                     var zip = new PizZip(content);
-                                                    const doc = new Docxtemplater(zip, { modules: [imageModule] });
+                                                    const doc = new Docxtemplater(zip, { modules: [imageModule,styleModule] });
                                                     
                                                     console.log("Here are the final results: " , bulletin_data);
                                                     doc.setData(bulletin_data);
@@ -500,10 +499,6 @@ export default class BulletinApp extends React.Component {
                 <div className={classes.block}>
                     <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.generateBulletin.bind(this, TEMPLATE_FORMATTED)} primary type="button" value="default">
                         {i18n.t('Generate Bulletin')}
-                    </Button>
-
-                    <Button className={classes.buttons} dataTest="dhis2-uicore-button" name="Primary button" onClick={this.generateBulletin.bind(this, TEMPLATE_UNFORMATTED)} type="button" value="default">
-                        {i18n.t('Download Maps')}
                     </Button>
 
     
