@@ -308,7 +308,7 @@ export default class BulletinApp extends React.Component {
 
                         console.log("retrieving " +table2_results.rows.length + " rows for Table II");
                        
-                        this.setState({ percent_done: 60 });
+                        this.setState({ percent_done: 50 });
 
                         var table2_data = {};
 
@@ -345,7 +345,7 @@ export default class BulletinApp extends React.Component {
                             console.log("retrieving " +table3_results.rows.length + " rows for Table III");
                             console.log(table3_results);
 
-                            this.setState({ percent_done: 80 });
+                            this.setState({ percent_done: 70 });
 
                              //shove all this into a object for reading later.
                             for (var i = 0; i < table3_results.rows.length; i++) {
@@ -367,37 +367,39 @@ export default class BulletinApp extends React.Component {
                                 //var template_path = "./assets/templates/test.v2.docx";
                              } 
 
-
                              d2.Api.getApi()
                             .get('/reportTables/mwIxx5SWy9b/data.json?date='+year_obj.year+'-'+month_obj.month_num+'-01')
                             .then(function(mapdata_results) {
 
                                 console.log("Got map data: ", mapdata_results['title']);
-                           
+                                this.setState({ percent_done: 80 });
+
                                 axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
                                 .then(res => {
-                                        
-                                    
+                                     
+                                    this.setState({ percent_done: 85 });
+                                    console.log("downloaded map image");
+
                                     //console.log(typeof (res.data));
                                     var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64')
-                                    console.log(imagedata);
+                                    
                                     
                                     var bulletin_data2= {"adampreston": "value"} ;
                                     bulletin_data2["image"] = imagedata;
 
-                                PizZipUtils.getBinaryContent(template_path,function(error,content){
-                            
-                                    var zip = new PizZip(content);
-                                    const doc = new Docxtemplater(zip, { modules: [imageModule] });
-                                    
-                                    this.setState({ percent_done: 95 });
-                                    
-                                    
-                                    console.log("Here are the final results: " , bulletin_data2);
-                                    doc.setData(bulletin_data2);
-                                    
-                                    
-                                    doc.resolveData(bulletin_data2).then(function () {
+                                    PizZipUtils.getBinaryContent(template_path,function(error,content){
+                                
+                                        this.setState({ percent_done: 90 });
+                                        console.log("merging data into document");
+
+                                        var zip = new PizZip(content);
+                                        const doc = new Docxtemplater(zip, { modules: [imageModule] });
+                                        
+                                        console.log("Here are the final results: " , bulletin_data2);
+                                        doc.setData(bulletin_data2);
+                                        
+                                        
+                                        this.setState({ percent_done: 95 });
                                         console.log("Downloaded maps");
 
                                         doc.render();
@@ -410,25 +412,13 @@ export default class BulletinApp extends React.Component {
 
                                         this.setState({ percent_done: 100 });  
                                         console.log("rendered");
+        
+        
+                                    }.bind(this));
 
-
-                                    });
-                                            
-     
-                                        }.bind(this));
-
-
-                                    }).catch(error => {
-                                        console.error(error)
-                                    });
-
-                                    
-                                    
-                                
-
-                                this.setState({ percent_done: 90 });
-
-                                
+                                }).catch(error => {
+                                    console.error(error)
+                                });
 
 
                             }.bind(this));  //Get map data
