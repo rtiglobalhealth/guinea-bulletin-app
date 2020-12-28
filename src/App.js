@@ -9,7 +9,6 @@ import { SingleSelectField } from '@dhis2/ui-widgets'
 import { init, getManifest } from 'd2';
 
 
-
 //import { getStyle } from './styles.js';
 import { getStyle } from "./styles";
 
@@ -31,9 +30,6 @@ const StyleModule = require("./style-es6");
 const styleModule = new StyleModule();
 
 const data = { image: "https://guinea-malaria-maps.herokuapp.com/static/totalconfirmed.png"}
-//const data = { image: "http://guinea.rti-ghd.org:81/incidence.png" };
-//const data = { image: "https://docxtemplater.com/xt-pro.png" };
-
 
 
 function base64DataURLToArrayBuffer(dataURL) {
@@ -61,18 +57,13 @@ const imageOpts = {
         return base64DataURLToArrayBuffer(tag);
     },
     getSize() {
-        return [100, 100];
+        return [600, 450];
     },
 };
 
 
-  
-
-
-
 const ImageModule = require("./image-es6");
 const imageModule = new ImageModule(imageOpts);
-
 
 
 function getHttpData(url, callback) {
@@ -243,7 +234,7 @@ export default class BulletinApp extends React.Component {
                 'C8uzbGBV5Ba', //Palu cas testés
                 'ZGVY1P1NNTu', //Palu cas confirmés 
                 'D0tVMBr7pne', //Palu cas simples traités 
-                'JcnnmqH9TTa',    //Palu cas graves traités 
+                'JcnnmqH9TTa',  //Palu cas graves traités 
                 'MW5F0uImS24', //Palu Total Déces
                 'no9OnzE3Yy7', //complétude
                 'yM51VVWhtk3']) //promptitude
@@ -345,7 +336,7 @@ export default class BulletinApp extends React.Component {
                             console.log("retrieving " +table3_results.rows.length + " rows for Table III");
                             console.log(table3_results);
 
-                            this.setState({ percent_done: 70 });
+                            this.setState({ percent_done: 60 });
 
                              //shove all this into a object for reading later.
                             for (var i = 0; i < table3_results.rows.length; i++) {
@@ -359,6 +350,7 @@ export default class BulletinApp extends React.Component {
                             
                             var bulletin_data = Object.assign({},month_obj,year_obj, table1_data,table2_data,table3_data, reporting_table, table3_styles);
                         
+
                              // Write this out
                              var template_path = "./assets/templates/bulletin.v2.docx";
                                     
@@ -372,49 +364,82 @@ export default class BulletinApp extends React.Component {
                             .then(function(mapdata_results) {
 
                                 console.log("Got map data: ", mapdata_results['title']);
-                                this.setState({ percent_done: 80 });
+                                this.setState({ percent_done: 70 });
 
                                 axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
                                 .then(res => {
-                                     
-                                    this.setState({ percent_done: 85 });
-                                    console.log("downloaded map image");
-
-                                    //console.log(typeof (res.data));
-                                    var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64')
                                     
+                                    this.setState({ percent_done: 75 });
+                                    console.log("downloaded confirmations.png");
+                                    var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
+                                    bulletin_data["img_confirmations"] = imagedata;
                                     
-                                    var bulletin_data2= {"adampreston": "value"} ;
-                                    bulletin_data2["image"] = imagedata;
+                                    axios.post('https://guinea-malaria-maps.herokuapp.com/totalconfirmed.png', mapdata_results, { responseType: 'arraybuffer' })
+                                    .then(res => {
+                                        
+                                        this.setState({ percent_done: 80 });
+                                        console.log("downloaded totalconfirmed.png");
+                                        var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
+                                        bulletin_data["img_totalconfirmed"] = imagedata;
 
-                                    PizZipUtils.getBinaryContent(template_path,function(error,content){
+                                        axios.post('https://guinea-malaria-maps.herokuapp.com/incidence.png', mapdata_results, { responseType: 'arraybuffer' })
+                                            .then(res => {
+                                                
+                                                this.setState({ percent_done: 85 });
+                                                console.log("downloaded incidence.png");
+                                                var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
+                                                bulletin_data["img_incidence"] = imagedata;
+
+                                                PizZipUtils.getBinaryContent(template_path,function(error,content){
                                 
-                                        this.setState({ percent_done: 90 });
-                                        console.log("merging data into document");
+                                                    this.setState({ percent_done: 90 });
+                                                    console.log("merging data into document");
+            
+                                                    var zip = new PizZip(content);
+                                                    const doc = new Docxtemplater(zip, { modules: [imageModule] });
+                                                    
+                                                    console.log("Here are the final results: " , bulletin_data);
+                                                    doc.setData(bulletin_data);
 
-                                        var zip = new PizZip(content);
-                                        const doc = new Docxtemplater(zip, { modules: [imageModule] });
-                                        
-                                        console.log("Here are the final results: " , bulletin_data2);
-                                        doc.setData(bulletin_data2);
-                                        
-                                        
-                                        this.setState({ percent_done: 95 });
-                                        console.log("Downloaded maps");
+                                                    try {
+                                                        doc.render()
+                                                    }
+                                                    catch (error) {
+                                                        var e = {
+                                                            message: error.message,
+                                                            name: error.name,
+                                                            stack: error.stack,
+                                                            properties: error.properties,
+                                                        }
+                                                        console.log(JSON.stringify({error: e}));
+                                                        // The error thrown here contains additional information when logged with JSON.stringify (it contains a property object).
+                                                        throw error;
+                                                    }
+                                                    
+                                                    this.setState({ percent_done: 95 });
+                                                    console.log("document rendered");
 
-                                        doc.render();
-                                        var out = doc.getZip().generate({
-                                            type: "blob",
-                                            mimeType:
-                                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                        });
-                                        saveAs(out, "generated.docx");
+                                                    var out = doc.getZip().generate({
+                                                        type: "blob",
+                                                        mimeType:
+                                                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                                    });
+                                                    saveAs(out, "generated.docx");
+            
+                                                    console.log("Done!");
+                                                    this.setState({ percent_done: 100 });  
+                                                    
+                    
+                                                }.bind(this));
+                                                
 
-                                        this.setState({ percent_done: 100 });  
-                                        console.log("rendered");
-        
-        
-                                    }.bind(this));
+                                            }).catch(error => {
+                                                console.error(error)
+                                            });
+
+                                    }).catch(error => {
+                                        console.error(error)
+                                    });
 
                                 }).catch(error => {
                                     console.error(error)
@@ -438,6 +463,7 @@ export default class BulletinApp extends React.Component {
             <ProgressBar
                     percent={this.state.percent_done}
                     filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+
                 />
                     
                 <div className={classes.block}>
