@@ -258,6 +258,17 @@ export default class BulletinApp extends React.Component {
             .addOrgUnitDimension(['Ky2CzFdfBuO'])
             .addOrgUnitDimension(['LEVEL-3']);
 
+
+        const mapdata = new d2.analytics.request()
+            .addDataDimension([
+                'F0WFRkrKQIW', //Palu % Toutes Consultations
+                'PifhiFgcyq1', // Proportion de cas de paludisme confirmés ayant reçu un traitement antipaludique dans les FOSA et ASC 
+                'ZGVY1P1NNTu', // PALU Cas confirmes total de paludisme
+                'mH24Ynkgo4K', // Taux d'incidence du paludisme
+                'wAsXYLfkVcX', // Population couverte             
+        ]).addPeriodDimension([period])
+            .addOrgUnitDimension(['Ky2CzFdfBuO'])
+            .addOrgUnitDimension(['LEVEL-3']);
         // Get the data
         d2.analytics.aggregate
             .get(reporting_rates)
@@ -358,11 +369,12 @@ export default class BulletinApp extends React.Component {
                                 //var template_path = "./assets/templates/test.v2.docx";
                              } 
 
-                             d2.Api.getApi()
-                            .get('/reportTables/mwIxx5SWy9b/data.json?date='+year_obj.year+'-'+month_obj.month_num+'-01')
-                            .then(function(mapdata_results) {
+                             d2.analytics.aggregate
+                             .get(mapdata)
+                             .then(function(mapdata_results) {
 
-                                console.log("Got map data: ", mapdata_results['title']);
+                                console.log("Got map data: ", mapdata_results);
+                                
                                 this.setState({ percent_done: 70 });
 
                                 axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
