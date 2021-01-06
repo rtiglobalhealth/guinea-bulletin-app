@@ -142,6 +142,10 @@ function initializeDistrictData(indicatorUIDArray){
     return table;
 }
 
+function handleError(table_name){
+    console.log("there was an error retreiving data for", table_name);
+    this.setState({ percent_done: 100, filledBackground: "#de1f1f" }) ;
+}
 
 
 export default class BulletinApp extends React.Component {
@@ -189,6 +193,7 @@ export default class BulletinApp extends React.Component {
 
          var d2 = this.state.d2;
          this.setState({ percent_done: 0 });
+         this.setState({filledBackground: "linear-gradient(to right, #fefb72, #f0bb31)"})
          
          var period = this.state.year+this.state.month;
 
@@ -233,7 +238,7 @@ export default class BulletinApp extends React.Component {
                 'C8uzbGBV5Ba', //Palu cas testés
                 'ZGVY1P1NNTu', //Palu cas confirmés 
                 'D0tVMBr7pne', //Palu cas simples traités 
-                'JcnnmqH9TTa',  //Palu cas graves traités 
+                'xpGLOKPCNl3',  //Palu cas graves traités 
                 'MW5F0uImS24', //Palu Total Déces
                 'no9OnzE3Yy7', //complétude
                 'yM51VVWhtk3']) //promptitude
@@ -269,6 +274,7 @@ export default class BulletinApp extends React.Component {
         ]).addPeriodDimension([period])
             .addOrgUnitDimension(['Ky2CzFdfBuO'])
             .addOrgUnitDimension(['LEVEL-3']);
+        
         // Get the data
         d2.analytics.aggregate
             .get(reporting_rates)
@@ -304,7 +310,7 @@ export default class BulletinApp extends React.Component {
                   
                     // Get data for table II (Taux d'incidence )
                     d2.Api.getApi()
-                    .get('/analytics?dimension=dx:mH24Ynkgo4K,ou:Ky2CzFdfBuO;LEVEL-5&filter=pe:201901&order=DESC&showHierarchy=true')
+                    .get('/analytics?dimension=dx:mH24Ynkgo4K,ou:Ky2CzFdfBuO;LEVEL-5&filter=pe:'+period+'&order=DESC&showHierarchy=true')
                     .then(function(table2_results) {
 
                         console.log("retrieving " +table2_results.rows.length + " rows for Table II");
@@ -360,7 +366,6 @@ export default class BulletinApp extends React.Component {
                             
                             var bulletin_data = Object.assign({},month_obj,year_obj, table1_data,table2_data,table3_data, reporting_table, table3_styles);
                         
-
                              // Write this out
                              var template_path = "./assets/templates/bulletin.v2.docx";
                                     
@@ -457,11 +462,26 @@ export default class BulletinApp extends React.Component {
                                 });
 
 
-                            }.bind(this));  //Get map data
-                        }.bind(this)); // Table III
-                    }.bind(this)); // Table II
-            }.bind(this)); // Table I
-        }.bind(this)  ); // Reporting table
+                            }.bind(this)).catch(error=> {
+                                console.log("problem getting data for maps:", error);
+                                this.setState({ percent_done: 100, filledBackground: "#de1f1f" });
+                            })//Get map data
+                        }.bind(this)).catch(error=> {
+                            console.log("problem getting data for table III:", error);
+                            this.setState({ percent_done: 100, filledBackground: "#de1f1f" });
+                        }); // Table III
+                    }.bind(this)).catch(error=> {
+                        console.log("problem getting data for table II:", error);
+                        this.setState({ percent_done: 100, filledBackground: "#de1f1f" });
+                    } ); // Table II
+            }.bind(this)).catch(error=> {
+                console.log("problem getting data for table I:", error);
+                this.setState({ percent_done: 100, filledBackground: "#de1f1f" });
+            } ); // Table I
+        }.bind(this)).catch(error=> {
+            console.log("problem getting data for the reporting rate table :", error);
+            this.setState({ percent_done: 100, filledBackground: "#de1f1f" });
+        } ); // Reporting rate table
 
      }
             
@@ -473,8 +493,8 @@ export default class BulletinApp extends React.Component {
 
             <ProgressBar
                     percent={this.state.percent_done}
-                    filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
-
+                    filledBackground={this.state.filledBackground}
+                    
                 />
                     
                 <div className={classes.block}>
