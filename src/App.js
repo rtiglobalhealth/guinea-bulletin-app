@@ -26,7 +26,7 @@ const axios = require('axios');
 const Stream = require("stream").Transform;
 const https = require("https");
 const StyleModule = require("./style-es6");
-const styleModule = new StyleModule();
+
 
 const data = { image: "https://guinea-malaria-maps.herokuapp.com/static/totalconfirmed.png"}
 
@@ -62,7 +62,7 @@ const imageOpts = {
 
 
 const ImageModule = require("./image-es6");
-const imageModule = new ImageModule(imageOpts);
+
 
 
 function getHttpData(url, callback) {
@@ -282,7 +282,7 @@ export default class BulletinApp extends React.Component {
                 
                 console.log("retrieving " +reporting_rate_results.rows.length + " rows for the reporting rates");
             
-                this.setState({ percent_done: 20 });
+                this.setState({ percent_done: 5 });
 
                 var reporting_table = {};
 
@@ -300,7 +300,7 @@ export default class BulletinApp extends React.Component {
                     var table1_data = {};
                     console.log("retrieving " +table1_results.rows.length + " rows for Table I");
 
-                    this.setState({ percent_done: 40 });
+                    this.setState({ percent_done: 10 });
 
                     //shove all this into a object for reading later.
                     for (var i = 0; i < table1_results.rows.length; i++) {
@@ -315,7 +315,7 @@ export default class BulletinApp extends React.Component {
 
                         console.log("retrieving " +table2_results.rows.length + " rows for Table II");
                        
-                        this.setState({ percent_done: 50 });
+                        this.setState({ percent_done: 20 });
 
                         var table2_data = {};
 
@@ -352,7 +352,7 @@ export default class BulletinApp extends React.Component {
                             console.log("retrieving " +table3_results.rows.length + " rows for Table III");
                             console.log(table3_results);
 
-                            this.setState({ percent_done: 60 });
+                            this.setState({ percent_done: 30 });
 
                              //shove all this into a object for later.
                             for (var i = 0; i < table3_results.rows.length; i++) {
@@ -380,12 +380,12 @@ export default class BulletinApp extends React.Component {
 
                                 console.log("Got map data: ", mapdata_results);
                                 
-                                this.setState({ percent_done: 70 });
+                                this.setState({ percent_done: 40 });
 
                                 axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
                                 .then(res => {
                                     
-                                    this.setState({ percent_done: 75 });
+                                    this.setState({ percent_done: 60 });
                                     console.log("downloaded confirmations.png");
                                     var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
                                     bulletin_data["img_confirmations"] = imagedata;
@@ -393,7 +393,7 @@ export default class BulletinApp extends React.Component {
                                     axios.post('https://guinea-malaria-maps.herokuapp.com/totalconfirmed.png', mapdata_results, { responseType: 'arraybuffer' })
                                     .then(res => {
                                         
-                                        this.setState({ percent_done: 80 });
+                                        this.setState({ percent_done: 60 });
                                         console.log("downloaded totalconfirmed.png");
                                         var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
                                         bulletin_data["img_totalconfirmed"] = imagedata;
@@ -401,21 +401,24 @@ export default class BulletinApp extends React.Component {
                                         axios.post('https://guinea-malaria-maps.herokuapp.com/incidence.png', mapdata_results, { responseType: 'arraybuffer' })
                                             .then(res => {
                                                 
-                                                this.setState({ percent_done: 85 });
+                                                this.setState({ percent_done: 70 });
                                                 console.log("downloaded incidence.png");
                                                 var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
                                                 bulletin_data["img_incidence"] = imagedata;
 
                                                 PizZipUtils.getBinaryContent(template_path,function(error,content){
                                 
-                                                    this.setState({ percent_done: 90 });
+                                                    this.setState({ percent_done: 80 });
                                                     console.log("merging data into document");
             
                                                     var zip = new PizZip(content);
+                                                    var imageModule = new ImageModule(imageOpts);
+                                                    const styleModule = new StyleModule();
                                                     const doc = new Docxtemplater(zip, { modules: [imageModule,styleModule] });
                                                     
                                                     console.log("Here are the final results: " , bulletin_data);
                                                     doc.setData(bulletin_data);
+                                                    this.setState({ percent_done: 90 });
 
                                                     try {
                                                         doc.render()
