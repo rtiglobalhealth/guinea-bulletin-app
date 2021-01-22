@@ -5,7 +5,7 @@ export function getStyle(dataelement, value){
 	const yellow = "#fffd54";
 	const red = "#eb3223";
 	const whiteTextColor = "#ffffff";
-	const blackTextColor = "#ffffff";
+	const blackTextColor = "#000000";
 
 	/*
 		Use color coding for percentages
