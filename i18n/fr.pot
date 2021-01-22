@@ -16,8 +16,10 @@ msgstr "Bulletin mensuel sur le paludisme"
 
 msgid ""
 "This application is used to export the monthly malaria report as a "
-"Microsoft Word document. To start, select the month and the button."
-msgstr "Cette application est utilisée pour exporter le rapport mensuel sur le paludisme sous forme de document Microsoft Word. Pour commencer, sélectionnez le mois et le bouton."
+"Microsoft Word document. To start, select the month and year and click on "
+"the the generate button. Please note that this process can take up to 2 "
+"minutes to complete."
+msgstr "Cette application est utilisée pour exporter le rapport mensuel sur le paludisme sous forme de document Microsoft Word. Pour commencer, sélectionnez le mois et l'année et cliquez sur le bouton. Veuillez noter que ce processus peut prendre jusqu'à 2 minutes."
 
 msgid "Generate Bulletin (non formatted)"
 msgstr "Générer le bulletin non formaté"
