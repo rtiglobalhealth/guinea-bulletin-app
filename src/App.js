@@ -238,7 +238,7 @@ export default class BulletinApp extends React.Component {
                 'C8uzbGBV5Ba', //Palu cas testés
                 'ZGVY1P1NNTu', //Palu cas confirmés 
                 'D0tVMBr7pne', //Palu cas simples traités 
-                'xpGLOKPCNl3',  //Palu cas graves traités 
+                'mJSKrscz8JU',  //Palu cas graves traités 
                 'MW5F0uImS24', //Palu Total Déces
                 'no9OnzE3Yy7', //complétude
                 'yM51VVWhtk3']) //promptitude
@@ -248,27 +248,26 @@ export default class BulletinApp extends React.Component {
         const table3 = new d2.analytics.request()
             .addDataDimension([
                 'no9OnzE3Yy7', //Complétude
-                'Ih6HJlhmY5d', // % de diagnostic
-                'PifhiFgcyq1', // % de traitement
-                'zAhqn2Vwacr', //% de TPI3  
-                'PifhiFgcyq1',   //% de confirmation
+                'en8WVglMBDT', // % de diagnostic
+                'OyEGolUTgkM', // % de traitement
+                'zAhqn2Vwacr', // % de TPI3  
+                'kw4i8nuOfwV',  // % de confirmation
                 'MW5F0uImS24', //Palu Total Déces
                 'kNmu11OsuGn', // Palu/Toutes Consultations
                 'nnk0OcCQJm5', // Mois de Stock - TDR
                 'qUdyYqApz8R',// Mois de Stock - ACT
                 'lno8U7t5TLI', // Mois de Stock - SP
-                // ART
-                //MILDA
+                'CjGyoUBQDDQ',// PALU Nombre de mois de stock Artesunate injectable 
+                'dRs1Cc4MAso' // % de MILDA en routine distribuée
         ]).addPeriodDimension([period])
             .addOrgUnitDimension(['Ky2CzFdfBuO'])
             .addOrgUnitDimension(['LEVEL-3']);
 
 
         const mapdata = new d2.analytics.request()
-            .addDataDimension([
-                'F0WFRkrKQIW', //Palu % Toutes Consultations
-                'PifhiFgcyq1', // Proportion de cas de paludisme confirmés ayant reçu un traitement antipaludique dans les FOSA et ASC 
-                'ZGVY1P1NNTu', // PALU Cas confirmes total de paludisme
+            .addDataDimension([ // Order very much matters in this case
+                'kNmu11OsuGn', //Palu % Toutes Consultations
+                'fk54L22yVF4', // Taux De Positivite
                 'mH24Ynkgo4K', // Taux d'incidence du paludisme
                 'wAsXYLfkVcX', // Population couverte             
         ]).addPeriodDimension([period])
@@ -347,7 +346,20 @@ export default class BulletinApp extends React.Component {
                             var table3_styles = {};
 
                             //initialize this (this is empty sometimes) for MW5F0uImS24
-                            table3_data = initializeDistrictData(["MW5F0uImS24","nnk0OcCQJm5"]); 
+                            table3_data = initializeDistrictData([
+                                'no9OnzE3Yy7', //Complétude
+                                'en8WVglMBDT', // % de diagnostic
+                                'OyEGolUTgkM', // % de traitement
+                                'zAhqn2Vwacr', // % de TPI3  
+                                'kw4i8nuOfwV',  // % de confirmation
+                                'MW5F0uImS24', //Palu Total Déces
+                                'kNmu11OsuGn', // Palu/Toutes Consultations
+                                'nnk0OcCQJm5', // Mois de Stock - TDR
+                                'qUdyYqApz8R',// Mois de Stock - ACT
+                                'lno8U7t5TLI', // Mois de Stock - SP
+                                'CjGyoUBQDDQ',// PALU Nombre de mois de stock Artesunate injectable 
+                                'dRs1Cc4MAso' // % de MILDA en routine distribuée
+                        ]); 
 
                             console.log("retrieving " +table3_results.rows.length + " rows for Table III");
                             console.log(table3_results);
@@ -382,21 +394,21 @@ export default class BulletinApp extends React.Component {
                                 
                                 this.setState({ percent_done: 40 });
 
-                                axios.post('https://guinea-malaria-maps.herokuapp.com/confirmations.png', mapdata_results, { responseType: 'arraybuffer' })
+                                axios.post('https://guinea-malaria-maps.herokuapp.com/confirmation_rate.png', mapdata_results, { responseType: 'arraybuffer' })
                                 .then(res => {
                                     
                                     this.setState({ percent_done: 60 });
-                                    console.log("downloaded confirmations.png");
+                                    console.log("downloaded Proportion du paludisme dans les consultations toutes causes confondues");
                                     var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
                                     bulletin_data["img_confirmations"] = imagedata;
                                     
-                                    axios.post('https://guinea-malaria-maps.herokuapp.com/totalconfirmed.png', mapdata_results, { responseType: 'arraybuffer' })
+                                    axios.post('https://guinea-malaria-maps.herokuapp.com/positivity_rate.png', mapdata_results, { responseType: 'arraybuffer' })
                                     .then(res => {
                                         
                                         this.setState({ percent_done: 60 });
-                                        console.log("downloaded totalconfirmed.png");
+                                        console.log("downloaded Taux de positivité dans les structures sanitaires et la communaute");
                                         var imagedata = "data:image/png;base64,"+Buffer.from(res.data, 'binary').toString('base64');
-                                        bulletin_data["img_totalconfirmed"] = imagedata;
+                                        bulletin_data["img_positive"] = imagedata;
 
                                         axios.post('https://guinea-malaria-maps.herokuapp.com/incidence.png', mapdata_results, { responseType: 'arraybuffer' })
                                             .then(res => {
@@ -443,7 +455,7 @@ export default class BulletinApp extends React.Component {
                                                         mimeType:
                                                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                                                     });
-                                                    saveAs(out, "generated.docx");
+                                                    saveAs(out, "bulletin-"+period+".docx");
             
                                                     console.log("Done!");
                                                     this.setState({ percent_done: 100 });  
@@ -502,7 +514,7 @@ export default class BulletinApp extends React.Component {
                     
                 <div className={classes.block}>
                     <h1>{i18n.t('Monthly Malaria Bulletin')}</h1>
-                    <p>{i18n.t('This application is used to export the monthly malaria report as a Microsoft Word document. To start, select the month and the button.')}</p>
+                    <p>{i18n.t('This application is used to export the monthly malaria report as a Microsoft Word document. To start, select the month and year and click on the the generate button. Please note that this process can take up to 2 minutes to complete.')}</p>
                 </div>       
             
                 <div className={classes.block}>
