@@ -154,7 +154,7 @@ export default class BulletinApp extends React.Component {
         super(props);
         this.state = {
             month: "01",
-            year: "2019",
+            year: "2021",
             percent_done: 0
         }; 
     
@@ -202,7 +202,30 @@ export default class BulletinApp extends React.Component {
          var month_name = ""
         if (this.state.month == "01"){
             month_name = i18n.t('January');
+        } else if (this.state.month == "02"){
+            month_name = i18n.t('February');
+        } else if (this.state.month == "03"){
+            month_name = i18n.t('March');
+        } else if (this.state.month == "04"){
+            month_name = i18n.t('April');
+        } else if (this.state.month == "05"){
+            month_name = i18n.t('May');
+        } else if (this.state.month == "06"){
+            month_name = i18n.t('June');
+        } else if (this.state.month == "07"){
+            month_name = i18n.t('July');
+        } else if (this.state.month == "08"){
+            month_name = i18n.t('August');
+        } else if (this.state.month == "09"){
+            month_name = i18n.t('September');
+        } else if (this.state.month == "10"){
+            month_name = i18n.t('October');
+        } else if (this.state.month == "11"){
+            month_name = i18n.t('November');
+        } else if (this.state.month == "12"){
+            month_name = i18n.t('December');
         }
+
         var month_obj = {
             month_name: month_name,
             month_num: this.state.month};
@@ -539,7 +562,7 @@ export default class BulletinApp extends React.Component {
                         <SingleSelectField dataTest="dhis2-uiwidgets-singleselectfield" onChange={this.updateyear.bind(this)}
                         className={classes.picker} selected={this.state.year}>
                             <SingleSelectOption dataTest="dhis2-uicore-singleselectoption" label="2020" value="2020"/>
-                            <SingleSelectOption dataTest="dhis2-uicore-singleselectoption" label="2019" value="2019"/>
+                            <SingleSelectOption dataTest="dhis2-uicore-singleselectoption" label="2021" value="2021"/>
                         </SingleSelectField>
                 </div>
 
